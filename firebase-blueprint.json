@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "plan": { "type": "string", "enum": ["Free", "Starter Engine", "Growth Accelerator", "Market Presence", "Category Leader", "Fractional CMO", "Enterprise Custom"] },
+        "company": { "type": "string" },
+        "bio": { "type": "string" },
+        "phone": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Project application data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "projectName": { "type": "string" },
+        "description": { "type": "string" },
+        "budget": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "reviewing", "accepted", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email", "projectName"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Store user profile information"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Store project applications"
+    }
+  }
+}

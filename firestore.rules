@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Entity validation
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) 
+        && data.uid == request.auth.uid
+        && data.email is string && data.email.size() < 200
+        && (!('plan' in data) || data.plan is string)
+        && (!('company' in data) || data.company is string)
+        && (!('bio' in data) || data.bio is string)
+        && (!('phone' in data) || data.phone is string);
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['userId', 'email', 'projectName', 'createdAt'])
+        && data.userId == request.auth.uid
+        && data.projectName is string && data.projectName.size() < 100
+        && data.email is string && data.email == request.auth.token.email;
+    }
+
+    // Collections
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    match /auth_otps/{email} {
+      allow get: if true; // In prod, this should be more restricted
+      allow create, update: if true; 
+    }
+
+    match /projects/{projectId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidProject(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid 
+                   && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['description', 'budget', 'projectName']);
+    }
+  }
+}
