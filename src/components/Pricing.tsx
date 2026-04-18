@@ -124,9 +124,8 @@ export function Pricing({ onGetStarted }: { onGetStarted: () => void }) {
 
               <button 
                 onClick={onGetStarted}
-                className={`group relative w-full py-4 rounded-xl font-bold transition-all overflow-hidden ${tier.highlighted ? 'bg-electric-blue text-white hover:brightness-110 shadow-lg shadow-electric-blue/20' : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'}`}
+                className={`w-full py-4 rounded-xl font-bold transition-all ${tier.highlighted ? 'bg-electric-blue text-white hover:brightness-110' : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'}`}
               >
-                {tier.highlighted && <div className="absolute inset-0 w-1/2 h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>}
                 Apply for Partnership
               </button>
             </motion.div>

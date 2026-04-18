@@ -19,22 +19,22 @@ export function TechStack() {
         </motion.div>
       </div>
 
-      <div className="relative w-full overflow-hidden flex items-center group">
-        <div className="absolute left-0 top-0 bottom-0 w-48 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none"></div>
+      <div className="relative w-full overflow-hidden flex items-center">
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0F1216] to-transparent z-10 hidden sm:block"></div>
         
         <motion.div 
           className="flex space-x-12 items-center whitespace-nowrap min-w-max px-12"
           animate={{ x: ["0%", "-50%"] }}
-          transition={{ ease: "linear", duration: 40, repeat: Infinity }}
+          transition={{ ease: "linear", duration: 30, repeat: Infinity }}
         >
           {[...technologies, ...technologies].map((tech, i) => (
-            <div key={i} className="flex items-center justify-center px-8 py-5 glass rounded-2xl border border-white/5 hover:border-electric-blue/30 hover:bg-electric-blue/5 transition-all duration-500 cursor-default">
-              <span className="text-sm font-bold tracking-tight text-slate-400 group-hover/marquee:text-white transition-colors">{tech}</span>
+            <div key={i} className="flex items-center justify-center px-6 py-3 glass rounded-full border border-white/10 hover:bg-white/10 transition-colors cursor-default">
+              <span className="text-sm font-semibold text-slate-300">{tech}</span>
             </div>
           ))}
         </motion.div>
 
-        <div className="absolute right-0 top-0 bottom-0 w-48 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0F1216] to-transparent z-10 hidden sm:block"></div>
       </div>
     </section>
   );

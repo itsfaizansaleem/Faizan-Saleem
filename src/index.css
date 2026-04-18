@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap&font-display=swap');
 @import "tailwindcss";
 
 @theme {
-  --bg: #0A0C10;
-  --slate-dark: #12151A;
-  --slate-light: #1E232B;
+  --bg: #0F1216;
+  --slate-dark: #1A1E23;
+  --slate-light: #2D333B;
   --electric-blue: #007AFF;
   --text-main: #FFFFFF;
   --text-dim: #94A3B8;
-  --glass: rgba(255, 255, 255, 0.02);
-  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
 
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Outfit", sans-serif;
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "Inter", "Helvetica Neue", Arial, sans-serif;
   
   --color-electric-blue: var(--electric-blue);
   --color-electric-blue-hover: #0066d6;
@@ -31,11 +31,6 @@
   @keyframes loader {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-  }
-
-  @keyframes shimmer {
-    0% { transform: skewX(-12deg) translateX(-100%); }
-    100% { transform: skewX(-12deg) translateX(250%); }
   }
 }
 

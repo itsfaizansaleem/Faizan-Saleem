@@ -1,52 +1,60 @@
-import { useState, FormEvent } from 'react';
-import { motion } from 'motion/react';
-import { Rocket, CheckCircle, Mail, MessageSquare, Briefcase, Loader2, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Rocket, CheckCircle, Mail, Key, Loader2, ArrowRight } from 'lucide-react';
 import { db } from '../lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
-
-import { User, Phone } from 'lucide-react';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 export function ProjectSection() {
-  const [name, setName] = useState('');
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
-  const [number, setNumber] = useState('');
-  const [message, setMessage] = useState('');
+  const [projectName, setProjectName] = useState('');
+  const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const submitProject = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!email.includes('@')) {
-      setError('Please enter a valid email');
-      return;
+  const nextStep = () => {
+    if (step === 1) {
+      if (!email.includes('@')) {
+        setError('Please enter a valid email');
+        return;
+      }
+      if (!projectName.trim()) {
+        setError('Project name is required');
+        return;
+      }
+      setError('');
+      setStep(2);
     }
-    if (!name.trim()) {
-      setError('Name is required');
+  };
+
+  const submitProject = async () => {
+    if (!description.trim()) {
+      setError('Please provide some details about your vision');
       return;
     }
     setLoading(true);
     setError('');
 
     try {
-      const submissionId = `sub_${Date.now()}`;
-      const submissionData = {
-        name,
+      const projectId = `proj_${Date.now()}`;
+      const projectData = {
+        userId: 'anonymous',
         email,
-        number,
-        message,
-        status: 'new_lead',
+        projectName,
+        description,
+        status: 'pending',
         createdAt: new Date().toISOString()
       };
 
       // 1. Store in Firestore
-      await setDoc(doc(db, 'inquiries', submissionId), submissionData);
+      await setDoc(doc(db, 'projects', projectId), projectData);
 
-      // 2. Send to Formspree
+      // 2. Send to Formspree link
       await fetch('https://formspree.io/f/xaqaokak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...submissionData, formType: 'Website Inquiry' })
+        body: JSON.stringify({ ...projectData, formType: 'New Venture Project Request' })
       });
 
       setSuccess(true);
@@ -69,15 +77,15 @@ export function ProjectSection() {
             <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-400" />
             </div>
-            <h2 className="text-4xl font-bold text-white mb-4">Message Received!</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">Venture Initialized!</h2>
             <p className="text-slate-400 text-lg mb-8">
-              Your inquiry has been sent to our team. We'll be in touch at {email} shortly.
+              Your project application has been secured in our database and sent to our team for immediate review. We'll be in touch via {email}.
             </p>
             <button 
-              onClick={() => { setSuccess(false); setName(''); setEmail(''); setNumber(''); setMessage(''); }}
+              onClick={() => { setSuccess(false); setStep(1); setEmail(''); setProjectName(''); setDescription(''); }}
               className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white rounded-xl font-bold transition-all border border-white/10"
             >
-              Back to Form
+              Submit Another Project
             </button>
           </motion.div>
         </div>
@@ -96,93 +104,108 @@ export function ProjectSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-electric-blue font-bold tracking-[3px] text-xs uppercase mb-4 block">New Project</span>
-            <h2 className="text-5xl font-bold text-white mb-6">Initialize Your Scale.</h2>
+            <span className="text-electric-blue font-bold tracking-[3px] text-xs uppercase mb-4 block">New Venture</span>
+            <h2 className="text-5xl font-bold text-white mb-6">Ready to let go with us?</h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Ready to engineer your next phase of growth? Share your vision below and our team will analyze your project for strategic alignment.
+              Initialize your project application. We analyze every partner to ensure the highest quality of service and strategic alignment.
             </p>
           </motion.div>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <motion.form 
-            onSubmit={submitProject}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass p-8 md:p-12 rounded-3xl border border-white/10 space-y-6"
-          >
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <input 
-                  type="text" 
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-electric-blue outline-none transition-all"
-                />
+          <div className="glass p-8 md:p-12 rounded-3xl border border-white/10">
+            <div className="flex items-center justify-center space-x-4 mb-10">
+                {[1, 2].map((s) => (
+                  <div key={s} className="flex items-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${step >= s ? 'bg-electric-blue text-white' : 'bg-white/5 text-slate-500 border border-white/10'}`}>
+                      {s}
+                    </div>
+                    {s < 2 && <div className={`w-12 h-0.5 mx-2 transition-all ${step > s ? 'bg-electric-blue' : 'bg-white/10'}`}></div>}
+                  </div>
+                ))}
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Business Email</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <input 
-                  type="email" 
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-electric-blue outline-none transition-all"
-                />
-              </div>
-            </div>
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.div 
+                    key="step1"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="space-y-6"
+                  >
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Business Email</label>
+                        <div className="relative">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                          <input 
+                            type="email" 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="yourname@brand.com"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-electric-blue outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Project Name</label>
+                        <input 
+                          type="text" 
+                          value={projectName}
+                          onChange={(e) => setProjectName(e.target.value)}
+                          placeholder="e.g. Q4 Growth Sprint"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white focus:border-electric-blue outline-none transition-all"
+                        />
+                      </div>
+                    </div>
+                    {error && <p className="text-red-400 text-sm">{error}</p>}
+                    <button 
+                      onClick={nextStep}
+                      className="w-full py-4 bg-electric-blue text-white rounded-xl font-bold hover:brightness-110 transition-all flex items-center justify-center shadow-lg shadow-electric-blue/20"
+                    >
+                      Continue to Details <ArrowRight className="w-4 h-4 ml-2" />
+                    </button>
+                  </motion.div>
+                )}
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Phone Number</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <input 
-                  type="tel" 
-                  required
-                  value={number}
-                  onChange={(e) => setNumber(e.target.value)}
-                  placeholder="+1 (555) 000-0000"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-electric-blue outline-none transition-all"
-                />
-              </div>
+                {step === 2 && (
+                  <motion.div 
+                    key="step2"
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="space-y-6"
+                  >
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Vision / Challenges</label>
+                      <textarea 
+                        rows={6}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="What is your current bottleneck and desired scale?"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white focus:border-electric-blue outline-none transition-all resize-none"
+                      />
+                    </div>
+                    {error && <p className="text-red-400 text-sm">{error}</p>}
+                    <div className="flex space-x-4">
+                      <button 
+                        onClick={() => setStep(1)}
+                        className="flex-1 py-4 bg-white/5 text-white rounded-xl font-bold hover:bg-white/10 transition-all border border-white/10"
+                      >
+                        Back
+                      </button>
+                      <button 
+                        onClick={submitProject}
+                        disabled={loading}
+                        className="flex-[2] py-4 bg-electric-blue text-white rounded-xl font-bold hover:brightness-110 transition-all flex items-center justify-center shadow-2xl shadow-electric-blue/30"
+                      >
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Launch Project Application <Rocket className="w-4 h-4 ml-2" /></>}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Message</label>
-              <div className="relative">
-                <MessageSquare className="absolute left-4 top-6 w-5 h-5 text-slate-500" />
-                <textarea 
-                  rows={4}
-                  required
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="How can we help your brand grow?"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:border-electric-blue outline-none transition-all resize-none"
-                />
-              </div>
-            </div>
-
-            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
-            
-            <button 
-              type="submit"
-              disabled={loading}
-              className="group relative w-full py-5 bg-electric-blue text-white rounded-xl font-bold transition-all flex items-center justify-center shadow-2xl shadow-electric-blue/30 overflow-hidden hover:brightness-110"
-            >
-              <div className="absolute inset-0 w-1/2 h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Send Inquiry <ArrowRight className="w-4 h-4 ml-2" /></>}
-            </button>
-          </motion.form>
         </div>
       </div>
     </section>

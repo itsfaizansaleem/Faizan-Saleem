@@ -38,22 +38,22 @@ export function Hero() {
           </motion.div>
 
           <motion.h1 
-            className="text-6xl md:text-8xl font-bold tracking-[-0.03em] text-white mb-8 leading-[0.9] md:leading-[1.1]"
+            className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-8 leading-tight"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
           >
             Scaling Brands Through <br className="hidden md:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-blue to-purple-600 inline-block hover:scale-105 transition-transform duration-500 cursor-default">Engineered Growth.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-blue to-purple-600 inline-block hover:scale-105 transition-transform duration-500 cursor-default">Data-Driven Creativity.</span>
           </motion.h1>
 
           <motion.p 
-            className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-medium"
+            className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
           >
-            We transform data into strategy and strategy into explosive revenue. Experience performance marketing engineered for the next decade of growth.
+            We transform data into strategy and strategy into revenue. Stop guessing and start scaling with performance marketing engineered for modern growth.
           </motion.p>
 
           <motion.div 
@@ -64,9 +64,8 @@ export function Hero() {
           >
             <button 
               onClick={() => window.dispatchEvent(new CustomEvent('openModal', { detail: 'onboarding' }))}
-              className="group relative w-full sm:w-auto inline-flex items-center justify-center px-[32px] py-[16px] text-[14px] font-bold text-white bg-electric-blue rounded-[12px] overflow-hidden hover:brightness-110 transition-all shadow-xl shadow-electric-blue/20"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-[28px] py-[14px] text-[13px] font-semibold text-white bg-electric-blue border border-transparent rounded-[8px] hover:-translate-y-0.5 transition-all"
             >
-              <div className="absolute inset-0 w-1/2 h-full bg-white/20 -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
               Get Started
             </button>
             <button 
